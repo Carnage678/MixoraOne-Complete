@@ -1,0 +1,28 @@
+{
+  "name": "@mixoraone/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MixoraOne web frontend (Next.js)",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo \"no web tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "@mixoraone/contracts": "workspace:*",
+    "next": "^16.2.10",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.2",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^5.9.3"
+  }
+}

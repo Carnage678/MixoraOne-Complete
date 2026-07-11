@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Builds
+dist/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Prisma generated client (regenerate with pnpm db:generate)
+apps/api/src/generated/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
