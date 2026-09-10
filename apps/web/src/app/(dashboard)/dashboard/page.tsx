@@ -1,32 +1,62 @@
 'use client';
 
 import { useAuth } from '@/features/auth/auth-context';
+import { DashboardHeader } from '@/features/dashboard/dashboard-header';
+import { DeveloperIdentityCard } from '@/features/dashboard/developer-identity-card';
+import { MixoraAiCard } from '@/features/dashboard/mixora-ai-card';
+import {
+  MOCK_AI_SUGGESTIONS,
+  MOCK_CONNECTED_ACCOUNTS,
+  MOCK_IDENTITY,
+  MOCK_METRICS,
+  MOCK_OPPORTUNITIES,
+  MOCK_PROJECTS,
+} from '@/features/dashboard/mock-data';
+import { OpportunitiesSection } from '@/features/dashboard/opportunities-section';
+import { PerformanceOverview } from '@/features/dashboard/performance-overview';
+import { ProjectShowcase } from '@/features/dashboard/project-showcase';
+import { QuickActions } from '@/features/dashboard/quick-actions';
+import { SocialGrowthCard } from '@/features/dashboard/social-growth-card';
+import { ToastProvider } from '@/features/dashboard/toast';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
+
+  // Override mock name with authenticated user name when available
+  const identity = { ...MOCK_IDENTITY, name: user.name || MOCK_IDENTITY.name };
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-12">
-      <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user.name}</h1>
-      <p className="mt-2 text-slate-300">
-        Signed in as {user.email} ({user.role.toLowerCase()})
-      </p>
+    <ToastProvider>
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:py-10">
+        {/* ── Header / welcome ─────────────────────────────────── */}
+        <DashboardHeader identity={identity} />
 
-      {!user.emailVerified && (
-        <div className="mt-6 rounded-lg bg-amber-500/10 px-4 py-3 text-sm text-amber-300">
-          Your email is not verified yet. Check your inbox for the verification link.
+        {/* ── Quick actions ────────────────────────────────────── */}
+        <div className="mt-8">
+          <QuickActions />
         </div>
-      )}
 
-      <div className="mt-10 rounded-xl bg-surface-muted p-6">
-        <h2 className="text-lg font-semibold">Your marketplace home</h2>
-        <p className="mt-2 text-sm text-slate-300">
-          Product listings, purchases, and licenses will appear here as the next modules ship.
-        </p>
+        {/* ── Identity + Performance ───────────────────────────── */}
+        <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <DeveloperIdentityCard identity={identity} />
+          <PerformanceOverview metrics={MOCK_METRICS} />
+        </div>
+
+        {/* ── Projects — primary visual focus ──────────────────── */}
+        <div className="mt-12">
+          <ProjectShowcase projects={MOCK_PROJECTS} />
+        </div>
+
+        {/* ── Opportunities + AI + Social ──────────────────────── */}
+        <div className="mt-12 grid gap-6 lg:grid-cols-2">
+          <OpportunitiesSection opportunities={MOCK_OPPORTUNITIES} />
+          <div className="flex flex-col gap-6">
+            <MixoraAiCard suggestions={MOCK_AI_SUGGESTIONS} />
+            <SocialGrowthCard accounts={MOCK_CONNECTED_ACCOUNTS} />
+          </div>
+        </div>
       </div>
-    </div>
+    </ToastProvider>
   );
 }
