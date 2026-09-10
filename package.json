@@ -18,7 +18,8 @@
     "services:up": "docker compose up -d",
     "services:down": "docker compose down",
     "db:generate": "pnpm --filter @mixoraone/api run db:generate",
-    "db:migrate": "pnpm --filter @mixoraone/api run db:migrate"
+    "db:migrate": "pnpm --filter @mixoraone/api run db:migrate",
+    "db:seed": "pnpm --filter @mixoraone/api run db:seed"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

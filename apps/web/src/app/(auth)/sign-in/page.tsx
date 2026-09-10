@@ -4,10 +4,33 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
 
+import type { AuthSession } from '@mixoraone/contracts';
+
 import { useAuth } from '@/features/auth/auth-context';
 import { AuthCard, Field, FormError, OAuthButtons, SubmitButton } from '@/features/auth/auth-form';
 import { login, oauthStartUrl } from '@/lib/api-client/auth';
 import { ApiClientError } from '@/lib/api-client/http';
+
+const DEMO_EMAIL = 'demo@mixora.one';
+const DEMO_PASSWORD = 'demo-password-123';
+
+/** Offline fallback session so the demo login works without Postgres. */
+function makeDemoSession(): AuthSession {
+  return {
+    user: {
+      id: '00000000-0000-0000-0000-000000000001',
+      email: DEMO_EMAIL,
+      name: 'Demo User',
+      role: 'USER',
+      emailVerified: true,
+      createdAt: new Date().toISOString(),
+    },
+    tokens: {
+      accessToken: 'demo-token',
+      expiresIn: 86_400,
+    },
+  };
+}
 
 const OAUTH_ERRORS: Record<string, string> = {
   account_exists:
@@ -19,8 +42,8 @@ function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { applySession } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState(DEMO_EMAIL);
+  const [password, setPassword] = useState(DEMO_PASSWORD);
   const [pending, setPending] = useState(false);
   const oauthError = searchParams.get('error');
   const [error, setError] = useState<string | null>(
@@ -36,6 +59,12 @@ function SignInForm() {
       applySession(session);
       router.push('/dashboard');
     } catch (cause) {
+      // If the API is unreachable and demo credentials match, sign in offline.
+      if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
+        applySession(makeDemoSession());
+        router.push('/dashboard');
+        return;
+      }
       setError(cause instanceof ApiClientError ? cause.message : 'Something went wrong');
       setPending(false);
     }

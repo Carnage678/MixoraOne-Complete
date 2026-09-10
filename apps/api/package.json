@@ -11,7 +11,8 @@
     "test": "jest",
     "db:generate": "prisma generate --schema ../../prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema ../../prisma/schema.prisma",
-    "db:migrate:deploy": "prisma migrate deploy --schema ../../prisma/schema.prisma"
+    "db:migrate:deploy": "prisma migrate deploy --schema ../../prisma/schema.prisma",
+    "db:seed": "ts-node --transpile-only ../../prisma/seed.ts"
   },
   "dependencies": {
     "@mixoraone/contracts": "workspace:*",

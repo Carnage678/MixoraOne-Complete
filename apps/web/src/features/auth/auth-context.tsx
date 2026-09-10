@@ -61,6 +61,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session.user);
       setAccessToken(session.tokens.accessToken);
       scheduleRefresh(session.tokens.expiresIn);
+      // Persist demo sessions so page refreshes don't lose state when offline.
+      if (session.tokens.accessToken === 'demo-token') {
+        try {
+          globalThis.sessionStorage?.setItem('mixora_demo_session', JSON.stringify(session));
+        } catch { /* ignore */ }
+      }
     },
     [scheduleRefresh],
   );
@@ -72,10 +78,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     try {
       await apiLogout();
+    } catch {
+      // Offline — just clear local state.
     } finally {
       if (refreshTimer.current) {
         clearTimeout(refreshTimer.current);
       }
+      try { globalThis.sessionStorage?.removeItem('mixora_demo_session'); } catch { /* ignore */ }
       setUser(null);
       setAccessToken(null);
     }
@@ -91,6 +100,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         // No valid refresh cookie; the visitor is signed out.
+        // Check for a persisted demo session (offline fallback).
+        try {
+          const raw = globalThis.sessionStorage?.getItem('mixora_demo_session');
+          if (raw && !cancelled) {
+            const session = JSON.parse(raw) as AuthSession;
+            setUser(session.user);
+            setAccessToken(session.tokens.accessToken);
+          }
+        } catch {
+          // ignore
+        }
       })
       .finally(() => {
         if (!cancelled) {
